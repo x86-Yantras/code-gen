@@ -9,10 +9,9 @@ import (
 )
 
 type Config struct {
-	ProjectStructure map[string][]string
-	PackageManager   string
-	ServiceDir       string
-	ReadmeFile       string
+	PackageManager string
+	ServiceDir     string
+	ReadmeFile     string
 }
 
 func New(configType string) (*Config, error) {
