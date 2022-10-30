@@ -1,0 +1,203 @@
+openapi: 3.0.0
+info:
+  title: dapp
+  version: 1.0.0
+servers:
+  - url: http://{{baseurl}}
+paths:
+  /users:
+    post:
+      operationId: createUser
+      tags:
+        - user
+      summary: create user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserPayload'
+      responses:
+        '201':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: string
+                name: string
+                coins: 0
+                location: string
+                gender: string
+                birthday: string
+                gifts: {}
+                avatar: string
+                bio: string
+                favorites: {}
+                username: string
+                contact: string
+                createdAt: 2022-01-02T00:00:00
+                updatedAt: 2022-01-02T00:00:00
+  /users/{userID}:
+    patch:
+      operationId: updateUser
+      tags:
+        - user
+      summary: update user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserPayload'
+      parameters:
+        - name: userID
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: string
+                name: string
+                coins: 0
+                location: string
+                gender: string
+                birthday: string
+                gifts: {}
+                avatar: string
+                bio: string
+                favorites: {}
+                username: string
+                contact: string
+                createdAt: 2022-01-02T00:00:00
+                updatedAt: 2022-01-02T00:00:00
+    get:
+      operationId: getUser
+      tags:
+        - user
+      summary: get user
+      parameters:
+        - name: userID
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: string
+                name: string
+                coins: 0
+                location: string
+                gender: string
+                birthday: string
+                gifts: {}
+                avatar: string
+                bio: string
+                favorites: {}
+                username: string
+                contact: string
+                createdAt: 2022-01-02T00:00:00
+                updatedAt: 2022-01-02T00:00:00
+    delete:
+      operationId: deleteUser
+      tags:
+        - user
+      summary: delete user
+      parameters:
+        - name: userID
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: success response
+          content: {}
+
+components:
+  schemas:
+    CreateUserPayload:
+      type: object
+      properties:
+        name: 
+          type: string
+        location:
+          type: string
+        gender:
+          type: string
+        birthday:
+          type: string
+        avatar:
+          type: string
+        bio:
+          type: string
+        favorites:
+          type: object
+          additionalProperties: true
+        username:
+          type: string
+        contact:
+          type: string
+    User:
+      type: object
+      properties:
+        name: 
+          type: string
+        location:
+          type: string
+        coins:
+          type: integer
+        gender:
+          type: string
+        birthday:
+          type: string
+        avatar:
+          type: string
+        bio:
+          type: string
+        favorites:
+          type: object
+          additionalProperties: true
+        gifts:
+          type: object
+          additionalProperties: true
+        username:
+          type: string
+        contact:
+          type: string   
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateUserPayload:
+      type: object
+      properties:
+        name: 
+          type: string
+        location:
+          type: string
+        avatar:
+          type: string
+        bio:
+          type: string
+        favorites:
+          type: object
+          additionalProperties: true
+        username:
+          type: string
+        contact:
+          type: string
