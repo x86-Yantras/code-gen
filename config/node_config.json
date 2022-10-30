@@ -1,0 +1,11 @@
+{
+  "projectStruct": {
+    ".": ["scripts", "src"],
+    "src": ["lib", "services", "config"],
+    "lib": ["context", "db", "logger", "middlewares"],
+    "middlewares": ["logRequest", "requestId"]
+  },
+  "serviceDir": "src/services",
+  "packageManager": "package.json",
+  "readmeFile": "Readme.md"
+}
