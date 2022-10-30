@@ -1,0 +1,9 @@
+const logger = (app = "") => {
+  return {
+    warn: (...args) => console.warn({ app, level: "warn", message: {...args} }),
+    info: (...args) => console.info({ app, level: "info", message: {...args} }),
+    error: (...args) => console.error({ app, level: "error", message: {...args} }),
+  };
+};
+  
+module.exports = logger

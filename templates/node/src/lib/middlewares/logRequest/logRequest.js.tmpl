@@ -1,0 +1,10 @@
+const requestLogger = (logger = console) => (req, res, next) => {
+  const requestMeta = {
+    path: req.path,
+    requestId: req.requestId,
+  };
+  logger.info(requestMeta);
+  next();
+};
+
+module.exports = requestLogger

@@ -1,0 +1,15 @@
+const express = require("express");
+const router = express.Router();
+
+{{range $.Handlers}}
+const {{.}} = require("./{{.}}");
+{{- end}}
+
+const registerRoutes = () => {
+{{- range $i, $route := $.Routes}}
+  router.{{$route.Method}}("/", $route.Handler);
+{{- end}}
+  return router;
+};
+
+module.exports = registerRoutes;
