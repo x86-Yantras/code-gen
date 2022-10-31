@@ -4,7 +4,8 @@ const requestId = require("./lib/middlewares/requestId/requestId");
 const cors = require("cors");
 const requestLogger = require("./lib/middlewares/logRequest/logRequest");
 
-const userAPI = require("./services/user/adapters/api/http/routes");
+// import api routes here
+// const apiAPI = require("./services/api/adapters/api/http/routes");
 
 const app = express();
 
@@ -24,7 +25,8 @@ const connectDB = require("./lib/db/mongo");
 
 connectDB().catch((err) => logger.error(err));
 
-app.use("/users", userAPI());
+// Populate routes here
+// app.use("/api", apiAPI());
 
 app.listen(apiPort, () => {
   logger.info(`api started at ${apiPort}`);
