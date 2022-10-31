@@ -57,6 +57,7 @@ func main() {
 		&filesys.Fs{},
 		appModel,
 		templater,
+		doc,
 		config,
 		fmt.Sprintf("%s/%s", constants.TemplatesDir, appLang),
 	}
@@ -66,8 +67,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	// for _, path := range doc.Paths {
-	// 	fmt.Printf("%+v", path)
-	// }
 }
