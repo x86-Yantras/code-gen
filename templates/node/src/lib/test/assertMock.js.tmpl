@@ -1,0 +1,6 @@
+const assertMock = (mockFunc, calls) => {
+    expect(mockFunc).toHaveBeenCalled();
+    expect(mockFunc.mock.calls.length).toEqual(calls)
+}
+
+module.exports = assertMock

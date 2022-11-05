@@ -1,0 +1,42 @@
+const { faker } = require("@faker-js/faker");
+
+const fakeMap = {
+  string: () => faker.datatype.string(),
+  number: () => faker.datatype.number(),
+  boolean: () => faker.datatype.boolean(),
+  uuid: () => faker.datatype.uuid(),
+};
+
+const fake = (input = {}) => {
+  const out = populate(input);
+  return out;
+};
+
+
+function populate(input, out = {}) {
+  for (let key in input) {
+    const value = input[key];
+
+    let valueType = typeof value;
+
+    if (key.includes("uuid")) {
+      valueType = "uuid";
+    }
+
+    if (fakeMap[valueType]) {
+      out[key] = fakeMap[valueType]();
+      continue;
+    }
+
+    if (valueType === "object") {
+      if (Array.isArray(value)) {
+        out[key] = populate(value, []);
+        continue;
+      }
+      out[key] = populate(value);
+    }
+  }
+  return out;
+}
+
+module.exports = fake
