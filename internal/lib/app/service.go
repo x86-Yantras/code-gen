@@ -18,34 +18,20 @@ type ServiceModel struct {
 
 func (app *App) CreateService() error {
 	for _, doc := range app.Spec.Paths {
-		if doc.Get != nil {
-			err := app.BuildService(doc.Get, http.MethodGet)
-			if err != nil {
-				return err
-			}
+		specList := map[string]*openapi3.Operation{
+			http.MethodGet:    doc.Get,
+			http.MethodPost:   doc.Post,
+			http.MethodPatch:  doc.Patch,
+			http.MethodPut:    doc.Put,
+			http.MethodDelete: doc.Delete,
 		}
-		if doc.Post != nil {
-			err := app.BuildService(doc.Post, http.MethodPost)
-			if err != nil {
-				return err
-			}
-		}
-		if doc.Patch != nil {
-			err := app.BuildService(doc.Patch, http.MethodPatch)
-			if err != nil {
-				return err
-			}
-		}
-		if doc.Put != nil {
-			err := app.BuildService(doc.Put, http.MethodPut)
-			if err != nil {
-				return err
-			}
-		}
-		if doc.Delete != nil {
-			err := app.BuildService(doc.Delete, http.MethodDelete)
-			if err != nil {
-				return err
+
+		for method, spec := range specList {
+			if spec != nil {
+				err := app.BuildService(spec, method)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -56,7 +42,7 @@ func (app *App) BuildService(spec *openapi3.Operation, operationType string) err
 	// Take first tag as service name
 	serviceName := spec.Tags[0]
 
-	if err := app.BuildDir(serviceName); err != nil {
+	if err := app.BuildServiceDir(serviceName); err != nil {
 		return err
 	}
 
@@ -140,11 +126,10 @@ func (app *App) BuildPayload(spec *openapi3.Operation, operationType string) map
 		app.extractParametes(spec.Parameters, payload)
 		app.extractBody(spec.RequestBody, payload)
 	}
-	fmt.Println(payload)
 	return payload
 }
 
-func (app *App) BuildDir(serviceName string) error {
+func (app *App) BuildServiceDir(serviceName string) error {
 	// create services dir
 	serviceDir := app.Config.ServiceDir
 
@@ -152,7 +137,7 @@ func (app *App) BuildDir(serviceName string) error {
 		return err
 	}
 
-	servicePath := fmt.Sprintf("%s/%s", serviceDir, serviceName)
+	servicePath := fmt.Sprintf("%s/%s/%s", serviceDir, serviceName, constants.Service)
 	if err := app.CreateDir(strings.ToLower(servicePath)); err != nil {
 		return err
 	}
@@ -162,11 +147,21 @@ func (app *App) BuildDir(serviceName string) error {
 
 func (app *App) BuildServiceFiles(serviceName, operation string, service *ServiceModel) error {
 	serviceDir := app.Config.ServiceDir
-	serviceFilePath := fmt.Sprintf("%s/%s/%s.js", serviceDir, serviceName, operation)
+	serviceFile := fmt.Sprintf("%s/%s/%s/%s", serviceDir, serviceName, constants.Service, operation)
 
-	serviceTemplatePath := fmt.Sprintf("%s/%s/%s/service/%s.js%s", app.AppTemplateDir, serviceDir, constants.ServiceDirPlaceholder, constants.ServiceFilePlaceholder, constants.TemplateExtension)
+	serviceFilePath := fmt.Sprintf("%s%s", serviceFile, app.Config.FileExt)
+	serviceTestPath := fmt.Sprintf("%s%s", serviceFile, app.Config.TestFileExt)
+
+	serviceTemplate := fmt.Sprintf("%s/%s/%s/service/%s", app.AppTemplateDir, serviceDir, constants.ServiceDirPlaceholder, constants.ServiceFilePlaceholder)
+
+	serviceTemplatePath := fmt.Sprintf("%s%s%s", serviceTemplate, app.Config.FileExt, constants.TemplateExtension)
+	serviceTestTemplatePath := fmt.Sprintf("%s%s%s", serviceTemplate, app.Config.TestFileExt, constants.TemplateExtension)
 
 	if err := app.Templater.Create(serviceFilePath, serviceTemplatePath, service); err != nil {
+		return err
+	}
+
+	if err := app.Templater.Create(serviceTestPath, serviceTestTemplatePath, service); err != nil {
 		return err
 	}
 	return nil
