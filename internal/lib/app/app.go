@@ -31,10 +31,12 @@ func (a *App) Execute(command string) error {
 		fmt.Printf("Building %s project... \n", a.AppModel.AppName)
 		err = a.InitProject()
 	case "services":
-		fmt.Printf("Building services... \n")
+		fmt.Printf("Building %s... \n", command)
 		err = a.CreateService()
 
-		// build cases for adapters
+	case "http":
+		fmt.Printf("Building %s... \n", command)
+		err = a.CreateHttpAdapter()
 
 	default:
 		return fmt.Errorf(constants.UndefinedCommandMsg, command)
