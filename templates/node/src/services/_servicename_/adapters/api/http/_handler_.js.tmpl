@@ -1,17 +1,23 @@
 const createContext = require("../../../../../lib/context/context");
 const logger = require("../../../../../lib/logger/logger");
-const {{.Service}}Svc = require("../../../service/{{.Service}}")
+const {{.ServiceName}}Svc = require("../../../service/{{.ServiceName}}")
 
-const {{.Handler}} = async (req, res) => {
+// {{.HandlerName}}...
+const {{.HandlerName}} = async (req, res) => {
   const context = createContext(req)
-  let id;
   try {
-      resp = await {{.Service}}Svc(context, req.body)
+      const payload = {
+        ...req.body, 
+        ...req.params,
+        ...req.query 
+      }
+
+      const resp = await {{.ServiceName}}Svc(context, payload)
+      return res.json(svcToResponse(resp))
   } catch (error) {
       logger.error(error)
+      res.status(400).json({message: error})
   }
-
-  return res.json(svcToResponse(resp))
 }
 
 const svcToResponse = (resp) => {
@@ -19,4 +25,5 @@ const svcToResponse = (resp) => {
 
   return resp
 }
-module.exports = {{.Handler}};
+
+module.exports = {{.HandlerName}};
