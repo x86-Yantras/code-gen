@@ -26,8 +26,9 @@ type RouteHandler struct {
 }
 
 func (app *App) CreateHttpAdapter() error {
-	for _, doc := range app.Spec.Paths {
+	serviceHandlers := map[string]map[string]string{}
 
+	for _, doc := range app.Spec.Paths {
 		specList := map[string]*openapi3.Operation{
 			http.MethodGet:    doc.Get,
 			http.MethodPost:   doc.Post,
@@ -37,22 +38,25 @@ func (app *App) CreateHttpAdapter() error {
 		}
 
 		handlers := map[string]string{}
-		var serviceName string
 
 		for method, spec := range specList {
 			if spec != nil {
+				if serviceHandlers[spec.Tags[0]] != nil {
+					handlers = serviceHandlers[spec.Tags[0]]
+				}
+
 				err := app.BuildHttpHandler(spec, method)
 				if err != nil {
 					return err
 				}
+
 				handlers[method] = spec.OperationID
-				if serviceName == "" {
-					serviceName = spec.Tags[0]
-				}
+				serviceHandlers[spec.Tags[0]] = handlers
 			}
 		}
-		app.BuildRoutes(handlers, serviceName)
 	}
+
+	app.BuildRoutes(serviceHandlers)
 	return nil
 }
 
@@ -117,44 +121,40 @@ func (app *App) BuildHandlerFile(serviceName, operation string, handler *Handler
 	handlerTemplatePath := fmt.Sprintf("%s%s%s", handlerTemplate, app.Config.FileExt, constants.TemplateExtension)
 	handlerTestTemplatePath := fmt.Sprintf("%s%s%s", handlerTemplate, app.Config.TestFileExt, constants.TemplateExtension)
 
-	if err := app.Templater.Create(handlerFilePath, handlerTemplatePath, handler); err != nil {
-		return err
+	files := []*created{
+		{handlerFilePath, handlerTemplatePath},
+		{handlerTestPath, handlerTestTemplatePath},
 	}
 
-	if err := app.Templater.Create(handlerTestPath, handlerTestTemplatePath, handler); err != nil {
-		return err
-	}
-
-	return nil
+	return app.CreateMultipleFiles(handler, files...)
 }
 
-func (app *App) BuildRoutes(handlers map[string]string, serviceName string) error {
-	handlerImports := []string{}
-	routes := make([]*RouteHandler, 0, len(handlers))
+func (app *App) BuildRoutes(serviceHandlers map[string]map[string]string) error {
 
-	fmt.Println("running here")
-	adapterDir := fmt.Sprintf(app.Config.AdapterDir, serviceName)
+	for serviceName, handlers := range serviceHandlers {
+		handlerImports := []string{}
+		routes := make([]*RouteHandler, 0, len(handlers))
 
-	for method, handler := range handlers {
-		handlerImports = append(handlerImports, handler)
-		routes = append(routes, &RouteHandler{
-			Method:  method,
-			Handler: handler,
-		})
-	}
-	routesFile := fmt.Sprintf("%s/%s/%s", adapterDir, constants.APIHTTPAdapter, app.Config.RoutesFile)
-	routerTemplatePath := fmt.Sprintf("%s/%s/%s/adapters/api/http/%s%s", app.AppTemplateDir, app.Config.ServiceDir, constants.ServiceDirPlaceholder, app.Config.RoutesFile, constants.TemplateExtension)
+		adapterDir := fmt.Sprintf(app.Config.AdapterDir, serviceName)
 
-	fmt.Printf("%+v", handlers)
-	fmt.Printf("%+v", routes)
+		for method, handler := range handlers {
+			handlerImports = append(handlerImports, handler)
+			routes = append(routes, &RouteHandler{
+				Method:  method,
+				Handler: handler,
+			})
+		}
+		routesFile := fmt.Sprintf("%s/%s/%s", adapterDir, constants.APIHTTPAdapter, app.Config.RoutesFile)
+		routerTemplatePath := fmt.Sprintf("%s/%s/%s/adapters/api/http/%s%s", app.AppTemplateDir, app.Config.ServiceDir, constants.ServiceDirPlaceholder, app.Config.RoutesFile, constants.TemplateExtension)
 
-	err := app.Templater.Create(routesFile, routerTemplatePath, &RoutesModel{
-		HandlerImports: handlerImports,
-		Routes:         routes,
-	}, true)
+		err := app.Templater.Create(routesFile, routerTemplatePath, &RoutesModel{
+			HandlerImports: handlerImports,
+			Routes:         routes,
+		}, true)
 
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
