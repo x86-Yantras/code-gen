@@ -1,0 +1,5 @@
+{
+  "serviceDir": "src/services",
+  "packageManager": "package.json",
+  "readmeFile": "Readme.md"
+}

@@ -1,0 +1,8 @@
+const createContext = (req) => {
+  return {
+    ...req.headers,
+    requestId: req.requestId,
+  };
+};
+
+module.exports = createContext;
