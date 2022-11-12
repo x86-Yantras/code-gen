@@ -37,9 +37,7 @@ func (a *App) Execute(command string) error {
 	case "http":
 		fmt.Printf("Building %s... \n", command)
 		err = a.CreateHttpAdapter()
-	case "storage":
-		fmt.Printf("Building %s... \n", command)
-		err = a.CreateStorageAdapter()
+
 	default:
 		return fmt.Errorf(constants.UndefinedCommandMsg, command)
 	}
