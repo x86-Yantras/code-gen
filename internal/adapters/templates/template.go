@@ -8,14 +8,15 @@ import (
 
 type Templates struct{}
 
-func (t *Templates) Create(fileName, templatePath string, data interface{}) error {
+func (t *Templates) Create(fileName, templatePath string, data interface{}, overwrite ...bool) error {
 	tpl, err := template.ParseFiles(templatePath)
 
 	if err != nil {
 		return err
 	}
-	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+	_, err = os.Stat(fileName)
 
+	if os.IsNotExist(err) || (len(overwrite) > 0 && overwrite[0]) {
 		file, err := os.Create(fileName)
 
 		if err != nil {

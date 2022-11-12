@@ -11,7 +11,11 @@ import (
 type Config struct {
 	PackageManager string
 	ServiceDir     string
+	AdapterDir     string
 	ReadmeFile     string
+	FileExt        string
+	TestFileExt    string
+	RoutesFile     string
 }
 
 func New(configType string) (*Config, error) {

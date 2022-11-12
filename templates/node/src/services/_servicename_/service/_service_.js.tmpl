@@ -1,0 +1,19 @@
+const storage = require("../adapters/storage/storage");
+const logger = require("../../../lib/logger/logger")();
+
+const {{.ServiceName}}Payload = {
+    {{ range $key, $value := .ServicePayload}}{{$key}}: {{if eq "string" (printf "%T" $value)}}''{{else}}{{$value}}{{end}},
+    {{end}} 
+}
+
+
+// {{.ServiceName}}...
+// {{.ServiceDescription}}
+const {{.ServiceName}} = async (context, payload = {{.ServiceName}}Payload) => {
+  logger.info(`create user request ${context.requestId}`);
+  const { _id } = await storage.{{.ServiceName}}(payload);
+
+  return _id;
+};
+
+module.exports = {{.ServiceName}};
