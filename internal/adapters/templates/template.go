@@ -1,12 +1,15 @@
 package templates
 
 import (
+	"embed"
 	"fmt"
 	"os"
 	"text/template"
 )
 
-type Templates struct{}
+type Templates struct {
+	Tmpls embed.FS
+}
 type Files struct {
 	FilePath     string
 	TemplatePath string
@@ -21,7 +24,11 @@ type FileCreateParams struct {
 }
 
 func (t *Templates) Create(params *FileCreateParams) error {
-	tpl, err := template.ParseFiles(params.TemplatePath)
+
+	dir, _ := t.Tmpls.ReadDir("templates/node/src/services/service")
+
+	fmt.Println(params.TemplatePath, dir)
+	tpl, err := template.ParseFS(t.Tmpls, params.TemplatePath)
 
 	if err != nil {
 		return err

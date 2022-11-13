@@ -1,6 +1,7 @@
 package app
 
 import (
+	"embed"
 	"fmt"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -17,6 +18,7 @@ type App struct {
 	Spec           *openapi3.T
 	Config         *config.Config
 	AppTemplateDir string
+	Templates      embed.FS
 }
 
 type AppModel struct {
