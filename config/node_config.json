@@ -5,5 +5,7 @@
   "readmeFile": "Readme.md",
   "fileExt": ".js",
   "testFileExt": ".spec.js",
-  "routesFile": "routes.js"
+  "routesFile": "routes.js",
+  "indexFile": "index.js",
+  "schemaFile": "schema.js"
 }
