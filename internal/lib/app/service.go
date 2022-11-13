@@ -84,10 +84,15 @@ func (app *App) getDefaultType(inType string) interface{} {
 		return 0
 	case "boolean":
 		return false
+	case "array":
+		return "[]"
+	case "object":
+		return "{}"
 	default:
 		return ""
 	}
 }
+
 func (s *ServiceModel) Validate() error {
 	if s.ServiceName == "" {
 		return errors.New("invalid spec file, operationId missing")
@@ -157,12 +162,10 @@ func (app *App) BuildServiceFiles(serviceName, operation string, service *Servic
 	serviceTemplatePath := fmt.Sprintf("%s%s%s", serviceTemplate, app.Config.FileExt, constants.TemplateExtension)
 	serviceTestTemplatePath := fmt.Sprintf("%s%s%s", serviceTemplate, app.Config.TestFileExt, constants.TemplateExtension)
 
-	if err := app.Templater.Create(serviceFilePath, serviceTemplatePath, service); err != nil {
-		return err
+	files := []*created{
+		{serviceFilePath, serviceTemplatePath},
+		{serviceTestPath, serviceTestTemplatePath},
 	}
 
-	if err := app.Templater.Create(serviceTestPath, serviceTestTemplatePath, service); err != nil {
-		return err
-	}
-	return nil
+	return app.CreateMultipleFiles(service, files...)
 }

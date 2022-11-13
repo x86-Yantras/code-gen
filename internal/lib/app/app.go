@@ -45,3 +45,17 @@ func (a *App) Execute(command string) error {
 	fmt.Printf(constants.ProjectBuiltMsg, a.AppModel.AppName)
 	return err
 }
+
+type created struct {
+	FilePath     string
+	TemplatePath string
+}
+
+func (app *App) CreateMultipleFiles(service interface{}, files ...*created) error {
+	for _, file := range files {
+		if err := app.Templater.Create(file.FilePath, file.TemplatePath, service); err != nil {
+			return err
+		}
+	}
+	return nil
+}
