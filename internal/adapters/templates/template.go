@@ -25,9 +25,6 @@ type FileCreateParams struct {
 
 func (t *Templates) Create(params *FileCreateParams) error {
 
-	dir, _ := t.Tmpls.ReadDir("templates/node/src/services/service")
-
-	fmt.Println(params.TemplatePath, dir)
 	tpl, err := template.ParseFS(t.Tmpls, params.TemplatePath)
 
 	if err != nil {
