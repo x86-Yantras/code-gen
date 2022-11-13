@@ -7,12 +7,14 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/x86-Yantras/code-gen/internal/adapters/templates"
 	"github.com/x86-Yantras/code-gen/internal/constants"
 )
 
 type ServiceModel struct {
 	ServiceName        string
 	ServiceDescription string
+	Operation          string
 	ServicePayload     interface{}
 }
 
@@ -47,8 +49,9 @@ func (app *App) BuildService(spec *openapi3.Operation, operationType string) err
 	}
 
 	service := &ServiceModel{
-		ServiceName:        spec.OperationID,
+		Operation:          spec.OperationID,
 		ServiceDescription: spec.Description,
+		ServiceName:        serviceName,
 	}
 	payload := app.BuildPayload(spec, operationType)
 
@@ -162,10 +165,10 @@ func (app *App) BuildServiceFiles(serviceName, operation string, service *Servic
 	serviceTemplatePath := fmt.Sprintf("%s%s%s", serviceTemplate, app.Config.FileExt, constants.TemplateExtension)
 	serviceTestTemplatePath := fmt.Sprintf("%s%s%s", serviceTemplate, app.Config.TestFileExt, constants.TemplateExtension)
 
-	files := []*created{
+	files := []*templates.Files{
 		{serviceFilePath, serviceTemplatePath},
 		{serviceTestPath, serviceTestTemplatePath},
 	}
 
-	return app.CreateMultipleFiles(service, files...)
+	return app.Templater.CreateMany(service, files...)
 }
