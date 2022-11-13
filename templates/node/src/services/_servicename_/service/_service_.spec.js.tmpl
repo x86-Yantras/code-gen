@@ -1,34 +1,39 @@
 const assertMock = require("../../../lib/test/assertMock");
 const context = require("../../../lib/test/context");
 const fake = require("../../../lib/test/faker");
-const storage = require("../adapters/storage/storage");
-const { {{.ServiceName}}Payload } = require("./{{.ServiceName}}");
-const {{.ServiceName}} = require("./{{.ServiceName}}");
-jest.mock("../adapters/storage/storage");
+const { {{.Operation}}Payload } = require("./{{.Operation}}");
+const {{.Operation}} = require("./{{.Operation}}");
+const storage = require("../adapters/storage");
 
-describe("{{.ServiceName}} test", () => {
-  const payload = fake({ {{.ServiceName}}Payload });
+jest.mock("../adapters/storage");
+
+describe("{{.Operation}} test", () => {
+  const payload = fake({ {{.Operation}}Payload });
 
   afterEach(() => {
-    storage.{{.ServiceName}}.mockClear();
+    storage.{{.ServiceName}}.{{.Operation}}.mockClear();
   });
 
-  it("should successfully run {{.ServiceName}}", async () => {
-    storage.{{.ServiceName}}.mockResolvedValue(payload);
-    const resp = await {{.ServiceName}}(context, payload);
+  beforeEach(() => {
+    storage.{{.ServiceName}}.{{.Operation}} = jest.fn();
+  });
 
-    expect(storage.{{.ServiceName}}).toHaveBeenCalledWith(context, payload);
+  it("should successfully run {{.Operation}}", async () => {
+    storage.{{.ServiceName}}.{{.Operation}}.mockResolvedValue(payload);
+    const resp = await {{.Operation}}(context, payload);
+
+    expect(storage.{{.ServiceName}}.{{.Operation}}).toHaveBeenCalledWith(context, payload);
     expect(resp).toEqual(payload);
-    assertMock(storage.{{.ServiceName}}, 1);
+    assertMock(storage.{{.ServiceName}}.{{.Operation}}, 1);
   });
 
   it("should throw error", async () => {
-    storage.{{.ServiceName}}.mockRejectedValue("db error");
+    storage.{{.ServiceName}}.{{.Operation}}.mockRejectedValue("db error");
     try {
-      await {{.ServiceName}}(context, payload);
+      await {{.Operation}}(context, payload);
     } catch (error) {
       expect(error).toEqual("db error");
     }
-    assertMock(storage.{{.ServiceName}}, 1);
+    assertMock(storage.{{.ServiceName}}.{{.Operation}}, 1);
   });
 });
