@@ -45,7 +45,7 @@ func main() {
 		panic(err)
 	}
 
-	config, err := config.New(appLang)
+	config := config.New(appLang)
 
 	if err != nil {
 		panic(err)
