@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"os"
 
@@ -12,6 +13,9 @@ import (
 	"github.com/x86-Yantras/code-gen/internal/constants"
 	"github.com/x86-Yantras/code-gen/internal/lib/app"
 )
+
+//go:embed templates
+var template embed.FS
 
 func main() {
 
@@ -51,7 +55,9 @@ func main() {
 		panic(err)
 	}
 
-	templater := &templates.Templates{}
+	templater := &templates.Templates{
+		template,
+	}
 	appModel := &app.AppModel{
 		AppName:        doc.Info.Title,
 		AppDescription: doc.Info.Description,
@@ -63,6 +69,7 @@ func main() {
 		doc,
 		config,
 		fmt.Sprintf("%s/%s", constants.TemplatesDir, appLang),
+		template,
 	}
 
 	err = app.Execute(command)
