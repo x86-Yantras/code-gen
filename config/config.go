@@ -16,6 +16,8 @@ type Config struct {
 	FileExt        string
 	TestFileExt    string
 	RoutesFile     string
+	IndexFile      string
+	SchemaFile     string
 }
 
 func New(configType string) (*Config, error) {
