@@ -37,25 +37,18 @@ func (a *App) Execute(command string) error {
 	case "http":
 		fmt.Printf("Building %s... \n", command)
 		err = a.CreateHttpAdapter()
-
+	case "storage":
+		fmt.Printf("Building %s... \n", command)
+		err = a.CreateStorageAdapter()
 	default:
 		return fmt.Errorf(constants.UndefinedCommandMsg, command)
 	}
+
+	if err != nil {
+		return err
+	}
+
 	fmt.Println()
 	fmt.Printf(constants.ProjectBuiltMsg, a.AppModel.AppName)
-	return err
-}
-
-type created struct {
-	FilePath     string
-	TemplatePath string
-}
-
-func (app *App) CreateMultipleFiles(service interface{}, files ...*created) error {
-	for _, file := range files {
-		if err := app.Templater.Create(file.FilePath, file.TemplatePath, service); err != nil {
-			return err
-		}
-	}
 	return nil
 }
