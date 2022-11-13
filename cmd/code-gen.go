@@ -22,7 +22,10 @@ func main() {
 		code-gen [api-specs.yaml][language][command]
 
 		command list:
-		init: init project`)
+		init: init project
+		services: generate services
+		http: generates http layer
+		storage: generates storage layer`)
 		os.Exit(0)
 	}
 
