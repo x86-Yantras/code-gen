@@ -1,0 +1,12 @@
+class {{.Name}} extends Error {
+  constructor(message, optDetails) {
+    super(message);
+    this.name = "{{.Name}}";
+    this.httpStatusCode = {{.HttpStatusCode}};
+    this.errors = {
+      ...optDetails,
+    };
+  }
+}
+
+module.exports = {{.Name}};
