@@ -154,8 +154,8 @@ func (app *App) BuildStorageFiles(serviceName, operation string, storage *Storag
 
 	storageEntityOpTemplate := fmt.Sprintf("%s/%s/%s/%s/%s%s%s", app.AppTemplateDir, adapterTemplateDir, constants.Storage, constants.DefaultStorage, constants.StorageEntityOpPlaceholder, app.Config.FileExt, constants.TemplateExtension)
 
-	files := []*templates.Files{
-		{storageEntityFile, storageEntityTemplate},
+	files := []*templates.FileCreateParams{
+		{FileName: storageEntityFile, TemplatePath: storageEntityTemplate},
 	}
 
 	err := app.Templater.CreateMany(storage, files...)

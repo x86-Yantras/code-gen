@@ -122,9 +122,9 @@ func (app *App) BuildHandlerFile(serviceName, operation string, handler *Handler
 	handlerTemplatePath := fmt.Sprintf("%s%s%s", handlerTemplate, app.Config.FileExt, constants.TemplateExtension)
 	handlerTestTemplatePath := fmt.Sprintf("%s%s%s", handlerTemplate, app.Config.TestFileExt, constants.TemplateExtension)
 
-	files := []*templates.Files{
-		{handlerFilePath, handlerTemplatePath},
-		{handlerTestPath, handlerTestTemplatePath},
+	files := []*templates.FileCreateParams{
+		{FileName: handlerFilePath, TemplatePath: handlerTemplatePath},
+		{FileName: handlerTestPath, TemplatePath: handlerTestTemplatePath},
 	}
 
 	return app.Templater.CreateMany(handler, files...)
@@ -141,7 +141,7 @@ func (app *App) BuildRoutes(serviceHandlers map[string]map[string]string) error 
 		for method, handler := range handlers {
 			handlerImports = append(handlerImports, handler)
 			routes = append(routes, &RouteHandler{
-				Method:  method,
+				Method:  strings.ToLower(method),
 				Handler: handler,
 			})
 		}
