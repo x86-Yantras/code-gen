@@ -127,9 +127,23 @@ paths:
           content: {}
 
 components:
+  errors:
+    - name: ValidationError
+      httpStatusCode: 400
+
+  errCodes:
+    - name: ValueRequired
+      code: "_value_required"
+    - name: InvalidValue
+      code: "_invalid_value"
+
   schemas:
     CreateUserPayload:
       type: object
+      required:
+      - name
+      - gender
+      - birthday
       properties:
         name: 
           type: string
