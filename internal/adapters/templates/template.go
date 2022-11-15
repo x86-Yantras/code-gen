@@ -34,7 +34,7 @@ func (t *Templates) Create(params *FileCreateParams) error {
 
 	_, err = os.Stat(params.FileName)
 
-	if os.Getenv("DEV_MODE") == "true" {
+	if os.Getenv("DEV_MODE") == "true" && !params.Append {
 		params.Overwrite = true
 	}
 
@@ -42,7 +42,7 @@ func (t *Templates) Create(params *FileCreateParams) error {
 
 	if NotExists || params.Append || params.Overwrite {
 
-		if params.Overwrite {
+		if params.Overwrite && !params.Append {
 			if !NotExists {
 				if err := os.Remove(params.FileName); err != nil {
 					return err
