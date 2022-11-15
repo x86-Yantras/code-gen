@@ -1,0 +1,1 @@
+{{- range $key, $value := $.Imports}}exports.{{$key}} = require("./{{$.StorageType}}/{{$key}}");{{- end}}

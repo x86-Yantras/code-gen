@@ -1,9 +1,0 @@
-{
-  "serviceDir": "src/services",
-  "adapterDir": "src/services/%s/adapters",
-  "packageManager": "package.json",
-  "readmeFile": "Readme.md",
-  "fileExt": ".js",
-  "testFileExt": ".spec.js",
-  "routesFile": "routes.js"
-}

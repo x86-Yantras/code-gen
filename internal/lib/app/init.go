@@ -2,12 +2,11 @@ package app
 
 import (
 	"io/fs"
-	"path/filepath"
 	"strings"
 )
 
 func (app *App) InitProject() error {
-	err := filepath.WalkDir(app.AppTemplateDir, func(path string, object fs.DirEntry, err error) error {
+	err := fs.WalkDir(app.Templates, ".", func(path string, object fs.DirEntry, err error) error {
 		if !strings.Contains(path, app.Config.ServiceDir) {
 			objectPath := strings.Replace(path, app.AppTemplateDir, ".", 1)
 			if object.IsDir() {

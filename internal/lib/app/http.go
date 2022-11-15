@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/x86-Yantras/code-gen/internal/adapters/templates"
 	"github.com/x86-Yantras/code-gen/internal/constants"
 )
 
@@ -121,12 +122,12 @@ func (app *App) BuildHandlerFile(serviceName, operation string, handler *Handler
 	handlerTemplatePath := fmt.Sprintf("%s%s%s", handlerTemplate, app.Config.FileExt, constants.TemplateExtension)
 	handlerTestTemplatePath := fmt.Sprintf("%s%s%s", handlerTemplate, app.Config.TestFileExt, constants.TemplateExtension)
 
-	files := []*created{
+	files := []*templates.Files{
 		{handlerFilePath, handlerTemplatePath},
 		{handlerTestPath, handlerTestTemplatePath},
 	}
 
-	return app.CreateMultipleFiles(handler, files...)
+	return app.Templater.CreateMany(handler, files...)
 }
 
 func (app *App) BuildRoutes(serviceHandlers map[string]map[string]string) error {
@@ -147,10 +148,15 @@ func (app *App) BuildRoutes(serviceHandlers map[string]map[string]string) error 
 		routesFile := fmt.Sprintf("%s/%s/%s", adapterDir, constants.APIHTTPAdapter, app.Config.RoutesFile)
 		routerTemplatePath := fmt.Sprintf("%s/%s/%s/adapters/api/http/%s%s", app.AppTemplateDir, app.Config.ServiceDir, constants.ServiceDirPlaceholder, app.Config.RoutesFile, constants.TemplateExtension)
 
-		err := app.Templater.Create(routesFile, routerTemplatePath, &RoutesModel{
-			HandlerImports: handlerImports,
-			Routes:         routes,
-		}, true)
+		err := app.Templater.Create(&templates.FileCreateParams{
+			FileName:     routesFile,
+			TemplatePath: routerTemplatePath,
+			Data: &RoutesModel{
+				HandlerImports: handlerImports,
+				Routes:         routes,
+			},
+			Overwrite: true,
+		})
 
 		if err != nil {
 			return err

@@ -1,5 +1,6 @@
 package templates
 
 type TemplatesIface interface {
-	Create(templateName, templatePath string, data interface{}, overwrite ...bool) error
+	Create(*FileCreateParams) error
+	CreateMany(service interface{}, files ...*Files) error
 }
