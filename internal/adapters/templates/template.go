@@ -13,6 +13,7 @@ type Templates struct {
 type Files struct {
 	FilePath     string
 	TemplatePath string
+	Overwrite    bool
 }
 
 type FileCreateParams struct {
@@ -33,7 +34,22 @@ func (t *Templates) Create(params *FileCreateParams) error {
 
 	_, err = os.Stat(params.FileName)
 
-	if os.IsNotExist(err) || params.Append || params.Overwrite {
+	if os.Getenv("DEV_MODE") == "true" && !params.Append {
+		params.Overwrite = true
+	}
+
+	NotExists := os.IsNotExist(err)
+
+	if NotExists || params.Append || params.Overwrite {
+
+		if params.Overwrite && !params.Append {
+			if !NotExists {
+				if err := os.Remove(params.FileName); err != nil {
+					return err
+				}
+			}
+		}
+
 		fileFlags := os.O_WRONLY | os.O_CREATE
 
 		if params.Append {
@@ -59,12 +75,13 @@ func (t *Templates) Create(params *FileCreateParams) error {
 	return nil
 }
 
-func (t *Templates) CreateMany(data interface{}, files ...*Files) error {
+func (t *Templates) CreateMany(data interface{}, files ...*FileCreateParams) error {
 	for _, file := range files {
 		if err := t.Create(&FileCreateParams{
-			FileName:     file.FilePath,
+			FileName:     file.FileName,
 			TemplatePath: file.TemplatePath,
 			Data:         data,
+			Overwrite:    file.Overwrite,
 		}); err != nil {
 			return err
 		}

@@ -9,6 +9,8 @@ const ServiceDirPlaceholder = `servicename`
 const TemplateExtension = ".tmpl"
 const ServiceFilePlaceholder = `service`
 const HandlerPlaceHolder = `handler`
+const TypesFile = "types"
+const TypesValidatorFile = "types_validation"
 
 // Messages
 const ProjectBuiltMsg = `Built %s, don't forget to commit`
@@ -30,3 +32,5 @@ const DefaultStorage = "mongo"
 
 // misc
 const Service = "service"
+const Errors = "errors"
+const ErrCodes = "errCodes"

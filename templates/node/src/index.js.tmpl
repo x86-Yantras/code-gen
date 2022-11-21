@@ -9,7 +9,7 @@ const requestLogger = require("./lib/middlewares/logRequest/logRequest");
 
 const app = express();
 
-const appName = {{.AppName}};
+const appName = "{{.AppName}}";
 
 app.use(express.json());
 app.use(requestId);

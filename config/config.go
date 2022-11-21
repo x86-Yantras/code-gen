@@ -4,6 +4,7 @@ type Config struct {
 	PackageManager string
 	ServiceDir     string
 	AdapterDir     string
+	LibDir         string
 	ReadmeFile     string
 	FileExt        string
 	TestFileExt    string

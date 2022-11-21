@@ -1,0 +1,10 @@
+const { ValueRequired } = require("../../../lib/errors/errCodes");
+const ValidationError = require("../../../lib/errors/validationError");
+
+{{range .}}
+exports.{{.Operation}}PayloadSchema = {
+  {{range $key, $value := .ServicePayload}}{{$key}}: {{if eq "string" (printf "%T" $value)}}''{{else}}{{$value}}{{end}},
+  {{end}} 
+};
+{{end}}
+

@@ -1,15 +1,10 @@
 const storage = require("../adapters/storage");
 const logger = require("../../../lib/logger/logger")();
-
-const {{.Operation}}Payload = {
-    {{ range $key, $value := .ServicePayload}}{{$key}}: {{if eq "string" (printf "%T" $value)}}''{{else}}{{$value}}{{end}},
-    {{end}} 
-}
-
+const {{.Operation}}PayloadSchema = require("./types");
 
 // {{.Operation}}...
 // {{.ServiceDescription}}
-const {{.Operation}} = async (context, payload = {{.Operation}}Payload) => {
+const {{.Operation}} = async (context, payload = {{.Operation}}PayloadSchema) => {
   logger.info(`create user request ${context.requestId}`);
   const resp = await storage.{{.ServiceName}}.{{.Operation}}(context, payload);
 
