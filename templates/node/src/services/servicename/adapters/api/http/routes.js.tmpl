@@ -8,7 +8,7 @@ const {{.}} = require("./{{.}}");
 const registerRoutes = () => {
 
 {{- range .Routes}}
-  router.{{.Method}}("/", {{.Handler}});
+  router.{{.Method}}("{{.Path}}", {{.Handler}});
 {{- end}}
 
   return router;
