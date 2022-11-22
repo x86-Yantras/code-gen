@@ -24,12 +24,13 @@ type RoutesModel struct {
 type RouteHandler struct {
 	Method  string
 	Handler string
+	Path    string
 }
 
 func (app *App) CreateHttpAdapter() error {
-	serviceHandlers := map[string]map[string]string{}
+	serviceHandlers := map[string][]*RouteHandler{}
 
-	for _, doc := range app.Spec.Paths {
+	for path, doc := range app.Spec.Paths {
 		specList := map[string]*openapi3.Operation{
 			http.MethodGet:    doc.Get,
 			http.MethodPost:   doc.Post,
@@ -38,7 +39,7 @@ func (app *App) CreateHttpAdapter() error {
 			http.MethodDelete: doc.Delete,
 		}
 
-		handlers := map[string]string{}
+		handlers := []*RouteHandler{}
 
 		for method, spec := range specList {
 			if spec != nil {
@@ -51,7 +52,13 @@ func (app *App) CreateHttpAdapter() error {
 					return err
 				}
 
-				handlers[method] = spec.OperationID
+				formattedPath := strings.Replace(path, "{", ":", 1)
+				formattedPath = strings.Replace(formattedPath, "}", "", 1)
+				handlers = append(handlers, &RouteHandler{
+					Method:  method,
+					Handler: spec.OperationID,
+					Path:    formattedPath,
+				})
 				serviceHandlers[spec.Tags[0]] = handlers
 			}
 		}
@@ -130,7 +137,7 @@ func (app *App) BuildHandlerFile(serviceName, operation string, handler *Handler
 	return app.Templater.CreateMany(handler, files...)
 }
 
-func (app *App) BuildRoutes(serviceHandlers map[string]map[string]string) error {
+func (app *App) BuildRoutes(serviceHandlers map[string][]*RouteHandler) error {
 
 	for serviceName, handlers := range serviceHandlers {
 		handlerImports := []string{}
@@ -138,11 +145,12 @@ func (app *App) BuildRoutes(serviceHandlers map[string]map[string]string) error 
 
 		adapterDir := fmt.Sprintf(app.Config.AdapterDir, serviceName)
 
-		for method, handler := range handlers {
-			handlerImports = append(handlerImports, handler)
+		for _, handler := range handlers {
+			handlerImports = append(handlerImports, handler.Handler)
 			routes = append(routes, &RouteHandler{
-				Method:  strings.ToLower(method),
-				Handler: handler,
+				Method:  strings.ToLower(handler.Method),
+				Handler: handler.Handler,
+				Path:    handler.Path,
 			})
 		}
 		routesFile := fmt.Sprintf("%s/%s/%s", adapterDir, constants.APIHTTPAdapter, app.Config.RoutesFile)

@@ -6,6 +6,7 @@ const requestLogger = require("./lib/middlewares/logRequest/logRequest");
 
 // import api routes here
 // const apiAPI = require("./services/api/adapters/api/http/routes");
+// const anotherAPI = require("./services/another/adapters/api/http/routes");
 
 const app = express();
 
@@ -26,7 +27,8 @@ const connectDB = require("./lib/db/mongo");
 connectDB().catch((err) => logger.error(err));
 
 // Populate routes here
-// app.use("/api", apiAPI());
+// app.use("/", apiAPI());
+// app.use("/", anotherAPI());
 
 app.listen(apiPort, () => {
   logger.info(`api started at ${apiPort}`);
