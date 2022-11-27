@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var GeneratorExceptionList = map[string]bool{"errors.js": true}
+
 func (app *App) InitProject() error {
 	err := fs.WalkDir(app.Templates, ".", func(path string, object fs.DirEntry, err error) error {
 		if !strings.Contains(path, app.Config.ServiceDir) {
@@ -18,8 +20,11 @@ func (app *App) InitProject() error {
 				return nil
 			}
 
-			if err := app.TemplateToFile(path, objectPath, app.AppModel); err != nil {
-				return err
+			// erros.go is created during service generation
+			if !strings.Contains(objectPath, "errors.js") {
+				if err := app.TemplateToFile(path, objectPath, app.AppModel); err != nil {
+					return err
+				}
 			}
 		}
 		return nil
