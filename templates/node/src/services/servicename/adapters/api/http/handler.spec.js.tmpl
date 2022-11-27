@@ -1,0 +1,35 @@
+const supertest = require("supertest");
+
+const routes = require("./routes");
+
+const server = require("../../../../../lib/test/server")(routes);
+const {{.ServiceName}}Svc = require("../../../service/{{.ServiceName}}");
+const { {{.ServiceName}}PayloadSchema } = require("../../../service/types");
+
+const fake = require("../../../../../lib/test/faker");
+
+jest.mock("../../../service/{{.ServiceName}}", () => jest.fn());
+
+const request = supertest(server);
+
+describe("{{.HandlerName}} test", () => {
+  it("should handle 500 error", async () => {
+    {{.ServiceName}}Svc.mockRejectedValue("internal server error");
+
+    const payload = fake({{.ServiceName}}PayloadSchema);
+    const res = await request.{{.Method}}("{{.Path}}").send(payload);
+
+    expect(res.statusCode).toEqual(500);
+  });
+
+  it("should return success with {{.HttpStatusCode}}", async () => {
+    {{.ServiceName}}Svc.mockResolvedValue({ test: true });
+    const payload = fake({{.ServiceName}}PayloadSchema);
+    const res = await request.{{.Method}}("{{.Path}}").send(payload);
+
+    expect(res.statusCode).toEqual({{.HttpStatusCode}});
+    {{if (ne .HttpStatusCode "204")}}
+    expect(res.body).toEqual({ test: true });
+    {{end}}
+  });
+});
