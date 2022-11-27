@@ -100,7 +100,9 @@ func (app *App) BuildService(spec *openapi3.Operation, operationType string) (*S
 
 	if spec.Parameters != nil {
 		for _, params := range spec.Parameters {
-			requiredValidation = append(requiredValidation, params.Value.Schema.Value.Required...)
+			if params.Value.Required {
+				requiredValidation = append(requiredValidation, params.Value.Name)
+			}
 		}
 	}
 
