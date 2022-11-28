@@ -14,7 +14,7 @@ const {{.HandlerName}} = async (req, res) => {
       }
 
       const resp = await {{.ServiceName}}Svc(context, {{.ServiceName}}Payload(payload))
-      return res.json(svcToResponse(resp))
+      return res.status({{.HttpStatusCode}}).json(svcToResponse(resp))
   } catch (error) {
       logger.error(error)
       res.status(error.httpStatusCode || 500).json({...error})

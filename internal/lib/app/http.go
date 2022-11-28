@@ -15,6 +15,9 @@ type HandlerModel struct {
 	HandlerName            string
 	ServiceName            string
 	ServiceResponsePayload interface{}
+	HttpStatusCode         string
+	Path                   string
+	Method                 string
 }
 
 type RoutesModel struct {
@@ -47,7 +50,7 @@ func (app *App) CreateHttpAdapter() error {
 					handlers = serviceHandlers[spec.Tags[0]]
 				}
 
-				err := app.BuildHttpHandler(spec, method)
+				err := app.BuildHttpHandler(spec, method, path, method)
 				if err != nil {
 					return err
 				}
@@ -68,7 +71,7 @@ func (app *App) CreateHttpAdapter() error {
 	return nil
 }
 
-func (app *App) BuildHttpHandler(spec *openapi3.Operation, operationType string) error {
+func (app *App) BuildHttpHandler(spec *openapi3.Operation, operationType, path, method string) error {
 	// Take first tag as handler name
 	serviceName := spec.Tags[0]
 
@@ -76,10 +79,21 @@ func (app *App) BuildHttpHandler(spec *openapi3.Operation, operationType string)
 		return err
 	}
 
+	statusCode := "200"
+	// find the success statusCode
+	for resp := range spec.Responses {
+		if strings.Contains(resp, "20") || strings.Contains(resp, "30") || strings.Contains(resp, "10") {
+			statusCode = resp
+		}
+	}
+
 	handler := &HandlerModel{
 		ServiceName:            spec.OperationID,
 		HandlerName:            spec.OperationID,
 		ServiceResponsePayload: nil,
+		Path:                   path,
+		HttpStatusCode:         statusCode,
+		Method:                 strings.ToLower(method),
 	}
 
 	if err := app.BuildHandlerFile(serviceName, spec.OperationID, handler); err != nil {

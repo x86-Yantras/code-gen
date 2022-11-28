@@ -18,8 +18,11 @@ func (app *App) InitProject() error {
 				return nil
 			}
 
-			if err := app.TemplateToFile(path, objectPath, app.AppModel); err != nil {
-				return err
+			// errors is created during service generation
+			if !strings.Contains(objectPath, "err") {
+				if err := app.TemplateToFile(path, objectPath, app.AppModel); err != nil {
+					return err
+				}
 			}
 		}
 		return nil
