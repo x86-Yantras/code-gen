@@ -5,7 +5,7 @@ const {{.Operation}}PayloadSchema = require("./types");
 // {{.Operation}}...
 // {{.ServiceDescription}}
 const {{.Operation}} = async (context, payload = {{.Operation}}PayloadSchema) => {
-  logger.info(`create user request ${context.requestId}`);
+  logger.info(`{{.Operation}} request ${context.requestId}`);
   const resp = await storage.{{.ServiceName}}.{{.Operation}}(context, payload);
 
   return resp;
