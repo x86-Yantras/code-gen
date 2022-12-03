@@ -1,14 +1,15 @@
 const assertMock = require("../../../lib/test/assertMock");
 const context = require("../../../lib/test/context");
 const fake = require("../../../lib/test/faker");
-const { {{.Operation}}Payload } = require("./{{.Operation}}");
+const { {{.Operation}}PayloadSchema, {{.Operation}}Payload } = require("./types");
 const {{.Operation}} = require("./{{.Operation}}");
 const storage = require("../adapters/storage");
+const ValidationError = require("../../../lib/errors/validationError");
 
 jest.mock("../adapters/storage");
 
 describe("{{.Operation}} test", () => {
-  const payload = fake({ {{.Operation}}Payload });
+  const payload = fake({ {{.Operation}}PayloadSchema });
 
   afterEach(() => {
     storage.{{.ServiceName}}.{{.Operation}}.mockClear();
@@ -35,5 +36,14 @@ describe("{{.Operation}} test", () => {
       expect(error).toEqual("db error");
     }
     assertMock(storage.{{.ServiceName}}.{{.Operation}}, 1);
+  });
+
+  it("should throw validation error", async () => {
+    try {
+      await {{.Operation}}(context, {{.Operation}}Payload({}));
+    } catch (error) {
+      expect(error instanceof ValidationError).toEqual(true);
+      expect(error.httpStatusCode).toEqual(400)
+    }
   });
 });

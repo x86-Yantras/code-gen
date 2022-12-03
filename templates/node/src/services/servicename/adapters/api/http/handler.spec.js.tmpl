@@ -32,4 +32,23 @@ describe("{{.HandlerName}} test", () => {
     expect(res.body).toEqual({ test: true });
     {{end}}
   });
+
+   it("should handle service 400 error", async () => {
+    {{.ServiceName}}Svc.mockRejectedValue({
+      httpStatusCode: 400,
+      name: "ValidationError",
+    });
+
+    {{if (ne .Method "get" )}}const payload = fake({{.ServiceName}}PayloadSchema);{{end}}
+    {{- if (eq .Method "get")}}
+    const res = await request.{{.Method}}("{{.Path}}");
+    {{- else}}
+    const res = await request.{{.Method}}("{{.Path}}").send(payload);
+    {{- end}}
+
+    expect(res.statusCode).toEqual(400);
+    
+    expect(res.body.name).toEqual("ValidationError");
+    
+  });
 });
