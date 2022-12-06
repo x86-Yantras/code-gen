@@ -1,5 +1,5 @@
 exports.{{.DBOperation}} = async (context, payload = schema) => {
     const {{.EntityObj}} = new {{.Entity}}(payload)
     // Fill with operation on {{.EntityObj}}
-    return user
+    return {{.EntityObj}}
 }
