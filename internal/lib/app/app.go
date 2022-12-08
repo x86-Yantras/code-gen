@@ -27,12 +27,6 @@ type AppModel struct {
 	AppDescription string
 }
 
-type ServiceSpecs struct {
-	ServiceName string
-	Method      string
-	Spec        *openapi3.Operation
-}
-
 func (a *App) Execute(command string) error {
 	var err error
 	switch command {
