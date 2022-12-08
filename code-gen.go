@@ -41,7 +41,7 @@ func main() {
 	service := ""
 
 	if len(args) == 5 {
-		service = args[5]
+		service = args[4]
 	}
 
 	ctx := context.Background()

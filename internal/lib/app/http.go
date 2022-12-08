@@ -46,8 +46,14 @@ func (app *App) CreateHttpAdapter() error {
 
 		for method, spec := range specList {
 			if spec != nil {
-				if serviceHandlers[spec.Tags[0]] != nil {
-					handlers = serviceHandlers[spec.Tags[0]]
+				serviceName := spec.Tags[0]
+
+				if app.ServiceName != "" && app.ServiceName != serviceName {
+					continue
+				}
+
+				if serviceHandlers[serviceName] != nil {
+					handlers = serviceHandlers[serviceName]
 				}
 
 				err := app.BuildHttpHandler(spec, method, path, method)

@@ -54,6 +54,10 @@ func (app *App) CreateService() error {
 		for method, spec := range specList {
 			if spec != nil {
 				serviceName := spec.Tags[0]
+
+				if app.ServiceName != "" && app.ServiceName != serviceName {
+					continue
+				}
 				service, err := app.BuildService(spec, method)
 
 				if err != nil {
