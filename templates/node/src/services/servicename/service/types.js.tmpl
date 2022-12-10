@@ -3,7 +3,7 @@ const ValidationError = require("../../../lib/errors/validationError");
 
 {{range .}}
 exports.{{.Operation}}PayloadSchema = {
-  {{range $key, $value := .ServicePayload}}{{$key}}: {{if eq "string" (printf "%T" $value)}}''{{else}}{{$value}}{{end}},
+  {{range $key, $value := .ServicePayload}}{{$key}}: {{$value}},
   {{end}} 
 };
 {{end}}
