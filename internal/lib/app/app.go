@@ -19,6 +19,7 @@ type App struct {
 	Config         *config.Config
 	AppTemplateDir string
 	Templates      embed.FS
+	ServiceName    string
 }
 
 type AppModel struct {

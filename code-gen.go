@@ -23,19 +23,26 @@ func main() {
 
 	if len(args) < 4 {
 		fmt.Println(`Usage:
-		code-gen [api-specs.yaml][language][command]
+		code-gen [api-specs.yaml][language][command][service]
 
 		command list:
 		init: init project
 		services: generate services
 		http: generates http layer
-		storage: generates storage layer`)
+		storage: generates storage layer
+		
+		service(optional): name of the service, should match the first tag value in spec file`)
 		os.Exit(0)
 	}
 
 	specFile := args[1]
 	appLang := args[2]
 	command := args[3]
+	service := ""
+
+	if len(args) == 5 {
+		service = args[4]
+	}
 
 	ctx := context.Background()
 	loader := &openapi3.Loader{
@@ -70,6 +77,7 @@ func main() {
 		config,
 		fmt.Sprintf("%s/%s", constants.TemplatesDir, appLang),
 		template,
+		service,
 	}
 
 	err = app.Execute(command)

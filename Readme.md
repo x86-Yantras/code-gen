@@ -17,7 +17,7 @@ An opinionated code geneartor for API driven development
 
 ### Usage
 ---
-> code-gen [path-to-api-spec] [language] [command]
+> code-gen [path-to-api-spec] [language] [command] [serviceName(optional)]
 
 ### Commands list
 --- 
@@ -29,6 +29,8 @@ An opinionated code geneartor for API driven development
 ### Notes
 ---
 - Please run npm i after running init command
+- Passing optional serviceName generates only for that service
+- Sevice name should match specs.tag[0] in api spec file
 
 ### How to Start
 ---

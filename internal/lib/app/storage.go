@@ -52,8 +52,14 @@ func (app *App) CreateStorageAdapter() error {
 
 		for _, spec := range specList {
 			if spec != nil {
-				if entities[spec.Tags[0]] != nil {
-					subEntity = entities[spec.Tags[0]]
+				serviceName := spec.Tags[0]
+
+				if app.ServiceName != "" && app.ServiceName != serviceName {
+					continue
+				}
+
+				if entities[serviceName] != nil {
+					subEntity = entities[serviceName]
 				}
 
 				err := app.BuildStorageAdapter(spec, &app.Spec.Components)
@@ -61,8 +67,8 @@ func (app *App) CreateStorageAdapter() error {
 					return err
 				}
 
-				subEntity[spec.Tags[0]] = true
-				entities[spec.Tags[0]] = subEntity
+				subEntity[serviceName] = true
+				entities[serviceName] = subEntity
 			}
 		}
 	}

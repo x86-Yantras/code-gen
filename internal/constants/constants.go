@@ -15,6 +15,8 @@ const TypesValidatorFile = "types_validation"
 // Messages
 const ProjectBuiltMsg = `Built %s, don't forget to commit`
 const UndefinedCommandMsg = `Cannot parse command %s`
+const TagMissingErr = `tags missing in method in spec file, please check example file`
+const TagDifferentErr = `different tags: %s under same path: %s`
 
 // HTTP
 const PayloadLimit = "limit"
