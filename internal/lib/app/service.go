@@ -272,7 +272,7 @@ func (app *App) extractBody(body *openapi3.RequestBodyRef, payloadObject map[str
 func (app *App) getDefaultType(inType string) interface{} {
 	switch inType {
 	case "string":
-		return ""
+		return "''"
 	case "number":
 		return 0
 	case "boolean":
