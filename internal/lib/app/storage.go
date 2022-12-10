@@ -138,7 +138,7 @@ func (app *App) getTypeString(inType string) interface{} {
 	case "boolean":
 		return "Boolean"
 	case "array":
-		return ""
+		return "[]"
 	case "object":
 		return "{}"
 	default:
