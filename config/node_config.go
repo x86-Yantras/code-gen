@@ -12,5 +12,6 @@ func NodeConfig() *Config {
 		RoutesFile:     "routes.js",
 		IndexFile:      "index.js",
 		SchemaFile:     "schema.js",
+		Language:       "node",
 	}
 }
