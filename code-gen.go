@@ -68,6 +68,8 @@ func main() {
 	appModel := &app.AppModel{
 		AppName:        doc.Info.Title,
 		AppDescription: doc.Info.Description,
+		ProjectPath:    config.ProjectPath,
+		LibDir:         config.LibDir,
 	}
 	app := &app.App{
 		&filesys.Fs{},
