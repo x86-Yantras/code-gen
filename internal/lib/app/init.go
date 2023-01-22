@@ -1,12 +1,14 @@
 package app
 
 import (
+	"fmt"
 	"io/fs"
 	"strings"
 )
 
 func (app *App) InitProject() error {
-	err := fs.WalkDir(app.Templates, ".", func(path string, object fs.DirEntry, err error) error {
+	root := fmt.Sprintf("templates/%s", app.Config.Language)
+	err := fs.WalkDir(app.Templates, root, func(path string, object fs.DirEntry, err error) error {
 		if !strings.Contains(path, app.Config.ServiceDir) {
 			objectPath := strings.Replace(path, app.AppTemplateDir, ".", 1)
 			if object.IsDir() {
