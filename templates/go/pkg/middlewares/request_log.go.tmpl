@@ -1,0 +1,26 @@
+package middlewares
+
+import (
+	"github.com/gin-gonic/gin"
+	"{{.LibDir}}/constants"
+	"{{.LibDir}}/contextutil"
+	"{{.LibDir}}/logger"
+)
+
+func LogRequest(log logger.Iface) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		requestID := contextutil.Get(ctx, constants.RequestIDKey)
+		var rID string
+		if requestID != nil {
+			rID = requestID.(string)
+		}
+
+		log.Info(ctx, "New Request", logger.Fields{
+			"path":      ctx.Request.URL.Path,
+			"method":    ctx.Request.Method,
+			"requestId": rID,
+		})
+
+		ctx.Next()
+	}
+}

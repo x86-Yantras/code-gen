@@ -1,0 +1,10 @@
+package contextutil
+
+import (
+	"github.com/gin-gonic/gin"
+	"{{.LibDir}}/constants"
+)
+
+func Set(ctx *gin.Context, key string, value any) {
+	ctx.Set(constants.RequestIDKey, value)
+}

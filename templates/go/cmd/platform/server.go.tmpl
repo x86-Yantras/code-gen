@@ -1,0 +1,76 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"{{.ProjectPath}}/config"
+	"{{.LibDir}}/logger"
+	"{{.LibDir}}/middlewares"
+)
+
+type Dependencies struct {
+	Config *config.Config
+	Logger *logger.Logger
+}
+
+func NewHTTPEngine(deps *Dependencies) (*gin.Engine, error) {
+	gin.SetMode(gin.ReleaseMode)
+
+	if deps.Config.Debug {
+		gin.SetMode(gin.DebugMode)
+	}
+
+	engine := gin.New()
+	engine.RedirectTrailingSlash = false
+	engine.HandleMethodNotAllowed = false
+
+	gin.DefaultErrorWriter = logger.Logger{}
+
+	engine.Use(middlewares.TagRequestID(deps.Logger))
+	engine.Use(middlewares.LogRequest(deps.Logger))
+
+	engine.Use(gin.Recovery())
+
+	engine.Use()
+	return engine, nil
+}
+
+func runHTTPServer(ctx context.Context, engine http.Handler, config *config.Config, log logger.Iface) func() {
+	server := &http.Server{
+		Addr:         config.Addr,
+		Handler:      engine,
+		ReadTimeout:  time.Duration(config.ServerTimeout) * time.Second,
+		WriteTimeout: time.Duration(config.ServerTimeout) * time.Second,
+	}
+
+	log.Info(ctx, "starting http server", map[string]interface{}{"addr": config.Addr})
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			log.Error(ctx, fmt.Errorf("err: %+v", "error starting server"))
+		}
+	}()
+
+	return func() {
+		if err := server.Shutdown(ctx); err != nil {
+			log.Error(ctx, fmt.Errorf("err: %+v", "error shutting down server gracefully"))
+		}
+	}
+}
+
+func listenForServerKill(ctx context.Context, log logger.Iface) {
+	killChan := make(chan os.Signal, 1)
+
+	signal.Notify(killChan, syscall.SIGTERM, syscall.SIGINT)
+
+	sign := <-killChan
+
+	log.Info(ctx, "gracefully killing server", logger.Fields{"signal": sign})
+}

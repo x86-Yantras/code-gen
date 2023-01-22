@@ -1,0 +1,19 @@
+package middlewares
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"{{.LibDir}}/constants"
+	"{{.LibDir}}/contextutil"
+	"{{.LibDir}}/logger"
+)
+
+func TagRequestID(log logger.Iface) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		requestID := contextutil.Get(ctx, constants.RequestIDKey)
+		if requestID == nil {
+			contextutil.Set(ctx, constants.RequestIDKey, uuid.NewString())
+		}
+		ctx.Next()
+	}
+}
