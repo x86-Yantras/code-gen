@@ -25,6 +25,9 @@ type App struct {
 type AppModel struct {
 	AppName        string
 	AppDescription string
+	ProjectPath    string
+	LibDir         string
+	RuntimeVersion string
 }
 
 func (a *App) Execute(command string) error {

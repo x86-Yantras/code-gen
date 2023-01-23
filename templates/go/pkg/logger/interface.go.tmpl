@@ -1,0 +1,11 @@
+package logger
+
+import "context"
+
+// Iface is logger interface
+type Iface interface {
+	Info(ctx context.Context, message string, fields ...Fields)
+	Debug(ctx context.Context, message string, fields ...Fields)
+	Error(ctx context.Context, err error, fields ...Fields)
+	Fatal(ctx context.Context, err error, fields ...Fields)
+}
