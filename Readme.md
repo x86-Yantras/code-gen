@@ -13,7 +13,7 @@ An opinionated code geneartor for API driven development
     - [x] Test generation with storage mock
 - [x] Adapter Generation
     - [x] Http Generation
-    - [x] Storage Generation
+    - [x] Storage Generation[Some 🐞 🐞]
 
 ### Usage
 ---
