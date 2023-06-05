@@ -16,8 +16,7 @@ type Core struct {
 	AppName        string
 	AppDescription string
 	services       []*Service
-	errors         []*Error
-	errCodes       []*ErrCode
+	errors         *Errors
 }
 
 // Service stores data required to build a single service
@@ -60,6 +59,7 @@ func NewCore(deps *Dependencies) (*Core, error) {
 	service := deps.Service
 	spec := deps.Spec
 	config := deps.Config
+	templater := deps.Templater
 
 	if spec == nil {
 		return nil, errors.New(constants.ErrorEmptySpec)
@@ -89,7 +89,7 @@ func NewCore(deps *Dependencies) (*Core, error) {
 					Config:    config,
 					Operation: method,
 					Spec:      operation,
-					Templater: deps.Templater,
+					Templater: templater,
 				})
 
 				if err != nil {
@@ -100,7 +100,7 @@ func NewCore(deps *Dependencies) (*Core, error) {
 					Config:    config,
 					Operation: method,
 					Spec:      operation,
-					Templater: deps.Templater,
+					Templater: templater,
 				})
 
 				if err != nil {
@@ -128,8 +128,19 @@ func NewCore(deps *Dependencies) (*Core, error) {
 		services = append(services, service)
 	}
 
+	errors, err := NewErrors(&ErrDependencies{
+		Config:    config,
+		Spec:      spec,
+		Templater: templater,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
 	core := &Core{
 		services: services,
+		errors:   errors,
 	}
 
 	if spec.Info != nil {
@@ -142,7 +153,7 @@ func NewCore(deps *Dependencies) (*Core, error) {
 
 func (c *Core) CreateService() error {
 	if len(c.services) == 0 || c.services == nil {
-		return errors.New("no servies to build")
+		return errors.New("no services to build")
 	}
 
 	for _, service := range c.services {
@@ -165,5 +176,21 @@ func (c *Core) CreateService() error {
 			}
 		}
 	}
+	return nil
+}
+
+func (c *Core) CreateErrors() error {
+	if c.errors == nil {
+		return errors.New("no errors to build")
+	}
+
+	if err := c.errors.BuildErrors(); err != nil {
+		return err
+	}
+
+	if err := c.errors.BuildErrorCodes(); err != nil {
+		return err
+	}
+
 	return nil
 }
