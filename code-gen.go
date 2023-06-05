@@ -8,7 +8,6 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/x86-Yantras/code-gen/config"
-	"github.com/x86-Yantras/code-gen/internal/adapters/filesys"
 	"github.com/x86-Yantras/code-gen/internal/adapters/templates"
 	"github.com/x86-Yantras/code-gen/internal/constants"
 	"github.com/x86-Yantras/code-gen/internal/lib/app"
@@ -70,9 +69,10 @@ func main() {
 		AppDescription: doc.Info.Description,
 		ProjectPath:    config.ProjectPath,
 		LibDir:         config.LibDir,
+		LibPath:        config.LibPath,
 	}
 	app := &app.App{
-		&filesys.Fs{},
+		&templates.Templates{},
 		appModel,
 		templater,
 		doc,
