@@ -24,9 +24,13 @@ func GoConfig() *Config {
 	projectPath := strings.Split(pwd, workSpace)[1]
 	projectPath = strings.Replace(projectPath, "/", "", 1)
 
-	serviceDir := fmt.Sprintf("%s/%s", projectPath, "internal/services")
-	libDir := fmt.Sprintf("%s/%s", projectPath, "pkg")
-	adapterDir := fmt.Sprintf("%s/%s", projectPath, "internal/services/%s/adapters")
+	serviceDir := "internal/services"
+	servicePath := fmt.Sprintf("%s/%s", projectPath, serviceDir)
+
+	libDir := "pkg"
+	libPath := fmt.Sprintf("%s/%s", projectPath, libDir)
+	adapterDir := "internal/services/%s/adapters"
+	adapterPath := fmt.Sprintf("%s/%s", projectPath, "internal/services/%s/adapters")
 
 	return &Config{
 		ServiceDir:     serviceDir,
@@ -42,5 +46,8 @@ func GoConfig() *Config {
 		ProjectPath:    projectPath,
 		RuntimeVersion: runtime.Version(),
 		Language:       "go",
+		LibPath:        libPath,
+		ServicePath:    servicePath,
+		AdapterPath:    adapterPath,
 	}
 }
