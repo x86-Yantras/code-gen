@@ -120,12 +120,12 @@ func (app *App) BuildAdapterDir(serviceName, adapterType string) error {
 	// create adapters dir
 	adapterDir := fmt.Sprintf(app.Config.AdapterDir, serviceName)
 
-	if err := app.CreateDir(adapterDir); err != nil {
+	if err := app.Templater.CreateDir(adapterDir); err != nil {
 		return err
 	}
 
 	adapterPath := fmt.Sprintf("%s/%s", adapterDir, adapterType)
-	if err := app.CreateDir(strings.ToLower(adapterPath)); err != nil {
+	if err := app.Templater.CreateDir(strings.ToLower(adapterPath)); err != nil {
 		return err
 	}
 
