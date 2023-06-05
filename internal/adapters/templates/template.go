@@ -88,3 +88,16 @@ func (t *Templates) CreateMany(data interface{}, files ...*FileCreateParams) err
 	}
 	return nil
 }
+
+func (f *Templates) CreateDir(name string) error {
+	if _, err := os.Stat(name); os.IsNotExist(err) {
+		err := os.MkdirAll(name, 0700)
+
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	fmt.Printf("Skipping: Dir %s already exists\n", name)
+	return nil
+}
