@@ -63,6 +63,11 @@ func (a *App) Execute(command string) error {
 		return err
 	}
 
+	err = core.CreateErrors()
+	if err != nil {
+		return err
+	}
+
 	fmt.Println()
 	fmt.Printf(constants.ProjectBuiltMsg, a.AppModel.AppName)
 	return nil

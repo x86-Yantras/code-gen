@@ -5,41 +5,86 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/x86-Yantras/code-gen/config"
 	"github.com/x86-Yantras/code-gen/internal/adapters/templates"
 	"github.com/x86-Yantras/code-gen/internal/constants"
 )
 
 type Errors struct {
+	errorDir    string
+	fileExt     string
+	templateDir string
+	templater   templates.TemplatesIface
+	Errors      []*Error
+	ErrCodes    []*ErrCode
+}
+
+// Error stores data to build custom errors
+type Error struct {
 	Name           string
 	HttpStatusCode int `json:"httpStatusCode"`
 }
 
-type ErrCodes struct {
+// ErrCode stores data to build custom error codes
+type ErrCode struct {
 	Name string
 	Code string
 }
 
-func (app *App) BuildErrors(errs interface{}) error {
+type ErrDependencies struct {
+	Config    *config.Config
+	Spec      *openapi3.T
+	Templater templates.TemplatesIface
+}
 
-	// Build errors dir
-	errDir := fmt.Sprintf("%s/%s", app.Config.LibDir, constants.Errors)
+func NewErrors(deps *ErrDependencies) (*Errors, error) {
+	extensions := deps.Spec.Components.ExtensionProps.Extensions
+	errors := []*Error{}
+	errCodes := []*ErrCode{}
 
-	if err := app.CreateDir(errDir); err != nil {
-		return err
+	if extensions != nil && extensions[constants.Errors] != nil {
+		errs := extensions[constants.Errors]
+
+		if err := json.Unmarshal(errs.(json.RawMessage), &errors); err != nil {
+			return nil, err
+		}
 	}
 
-	errors := []*Errors{}
+	if extensions != nil && extensions[constants.ErrCodes] != nil {
+		errs := extensions[constants.ErrCodes]
 
-	if err := json.Unmarshal(errs.(json.RawMessage), &errors); err != nil {
+		if err := json.Unmarshal(errs.(json.RawMessage), &errCodes); err != nil {
+			return nil, err
+		}
+	}
+
+	return &Errors{
+		templater:   deps.Templater,
+		Errors:      errors,
+		ErrCodes:    errCodes,
+		fileExt:     deps.Config.FileExt,
+		errorDir:    deps.Config.LibDir,
+		templateDir: fmt.Sprintf("%s/%s", constants.TemplatesDir, deps.Config.Language),
+	}, nil
+}
+
+func (e *Errors) BuildErrors() error {
+
+	// Build errors dir
+	errDir := fmt.Sprintf("%s/%s", e.errorDir, constants.Errors)
+
+	if err := e.templater.CreateDir(errDir); err != nil {
 		return err
 	}
 
 	// Build custom errors
-	for _, err := range errors {
-		errFile := fmt.Sprintf("%s/%s/%s%s", app.Config.LibDir, constants.Errors, app.ToLowerFirst(err.Name), app.Config.FileExt)
-		tplPath := fmt.Sprintf("%s/%s/%s/%s%s%s", app.AppTemplateDir, app.Config.LibDir, constants.Errors, constants.Errors, app.Config.FileExt, constants.TemplateExtension)
+	fmt.Println("building errors")
+	for _, err := range e.Errors {
+		errFile := fmt.Sprintf("%s/%s/%s%s", e.errorDir, constants.Errors, ToLowerFirst(err.Name), e.fileExt)
+		tplPath := fmt.Sprintf("%s/%s/%s/%s%s%s", e.templateDir, e.errorDir, constants.Errors, constants.Errors, e.fileExt, constants.TemplateExtension)
 
-		err := app.Templater.Create(&templates.FileCreateParams{
+		err := e.templater.Create(&templates.FileCreateParams{
 			FileName:     errFile,
 			TemplatePath: tplPath,
 			Data:         err,
@@ -54,27 +99,25 @@ func (app *App) BuildErrors(errs interface{}) error {
 	return nil
 }
 
-func (app *App) BuildErrorCodes(errCodes interface{}) error {
-
-	errorCodes := []*ErrCodes{}
-
-	if err := json.Unmarshal(errCodes.(json.RawMessage), &errorCodes); err != nil {
-		return err
-	}
+func (e *Errors) BuildErrorCodes() error {
 
 	// Build custom errors
-	errFile := fmt.Sprintf("%s/%s/%s%s", app.Config.LibDir, constants.Errors, constants.ErrCodes, app.Config.FileExt)
-	tplPath := fmt.Sprintf("%s/%s/%s/%s%s%s", app.AppTemplateDir, app.Config.LibDir, constants.Errors, constants.ErrCodes, app.Config.FileExt, constants.TemplateExtension)
+	errFile := fmt.Sprintf("%s/%s/%s%s", e.errorDir, constants.Errors, constants.ErrCodes, e.fileExt)
+	tplPath := fmt.Sprintf("%s/%s/%s/%s%s%s", e.templateDir, e.errorDir, constants.Errors, constants.ErrCodes, e.fileExt, constants.TemplateExtension)
 
 	fmt.Println("building err codes")
-	err := app.Templater.Create(&templates.FileCreateParams{
+	err := e.templater.Create(&templates.FileCreateParams{
 		FileName:     errFile,
 		TemplatePath: tplPath,
-		Data:         errorCodes,
+		Data:         e.ErrCodes,
 		Overwrite:    true,
 	})
 
 	return err
+}
+
+func ToLowerFirst(input string) string {
+	return strings.ToLower(string(input[0])) + input[1:]
 }
 
 func (app *App) ToLowerFirst(input string) string {
