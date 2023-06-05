@@ -88,7 +88,7 @@ func (app *App) BuildStorageAdapter(spec *openapi3.Operation, components *openap
 	adapterDir := fmt.Sprintf(app.Config.AdapterDir, serviceName)
 	adapterTypeDir := fmt.Sprintf("%s/%s/%s", adapterDir, constants.Storage, constants.DefaultStorage)
 
-	if err := app.CreateDir(adapterTypeDir); err != nil {
+	if err := app.Templater.CreateDir(adapterTypeDir); err != nil {
 		return err
 	}
 
