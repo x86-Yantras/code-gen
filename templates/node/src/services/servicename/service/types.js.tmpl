@@ -1,10 +1,7 @@
-const { ValueRequired } = require("../../../lib/errors/errCodes");
-const ValidationError = require("../../../lib/errors/validationError");
 
-{{range .}}
 exports.{{.Operation}}PayloadSchema = {
-  {{range $key, $value := .ServicePayload}}{{$key}}: {{$value}},
-  {{end}} 
+  {{- range $key, $value := .ServicePayload}}
+  {{$key}}: {{$value -}},
+  {{- end}}
 };
-{{end}}
 

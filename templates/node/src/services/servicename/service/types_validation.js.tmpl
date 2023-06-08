@@ -1,18 +1,17 @@
-{{range .}}
 exports.{{.Operation}}Payload = (payload = this.{{.Operation}}PayloadSchema) => {
   const errors = {};
-
-{{ range $attribute, $index  := .Validation}}
+  {{ range $attribute, $index  := .Validation}}
   if (!payload.{{$attribute}}) {
     errors["{{$attribute}}"] = ValueRequired;
   }
-{{end}}
+  {{end}}
   if (Object.keys(errors).length > 0) {
-    throw new ValidationError("validation error", errors)
+    throw new ValidationError("validation error", errors);
   }
+
   return {
-    {{range $key, $value := .ServicePayload}}{{$key}}: payload.{{$key}},
-    {{end}} 
+    {{- range $key, $value := .ServicePayload}}
+    {{$key}}: payload.{{$key}},
+    {{- end}}
   };
 };
-{{end}}

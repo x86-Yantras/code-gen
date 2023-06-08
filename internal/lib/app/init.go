@@ -13,7 +13,7 @@ func (app *App) InitProject() error {
 			objectPath := strings.Replace(path, app.AppTemplateDir, ".", 1)
 			if object.IsDir() {
 				if objectPath != "." {
-					if err := app.CreateDir(objectPath); err != nil {
+					if err := app.Templater.CreateDir(objectPath); err != nil {
 						return err
 					}
 				}

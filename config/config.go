@@ -16,6 +16,9 @@ type Config struct {
 	ProjectPath    string
 	RuntimeVersion string
 	Language       string
+	LibPath        string
+	ServicePath    string
+	AdapterPath    string
 }
 
 func New(configType string) *Config {

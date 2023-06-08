@@ -6,13 +6,12 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/x86-Yantras/code-gen/config"
-	"github.com/x86-Yantras/code-gen/internal/adapters/filesys"
 	"github.com/x86-Yantras/code-gen/internal/adapters/templates"
 	"github.com/x86-Yantras/code-gen/internal/constants"
 )
 
 type App struct {
-	filesys.FsIface
+	templates.TemplatesIface
 	*AppModel
 	Templater      templates.TemplatesIface
 	Spec           *openapi3.T
@@ -28,18 +27,28 @@ type AppModel struct {
 	ProjectPath    string
 	LibDir         string
 	RuntimeVersion string
+	LibPath        string
 }
 
 func (a *App) Execute(command string) error {
-	var err error
+	core, err := NewCore(&Dependencies{
+		Spec:      a.Spec,
+		Service:   a.ServiceName,
+		Config:    a.Config,
+		Templater: a.Templater,
+	})
+
+	if err != nil {
+		return fmt.Errorf("%s, %s", "error initalizing core", err.Error())
+	}
+
 	switch command {
 	case "init":
 		fmt.Printf("Building %s project... \n", a.AppModel.AppName)
 		err = a.InitProject()
 	case "services":
 		fmt.Printf("Building %s... \n", command)
-		err = a.CreateService()
-
+		err = core.CreateService()
 	case "http":
 		fmt.Printf("Building %s... \n", command)
 		err = a.CreateHttpAdapter()
@@ -47,9 +56,14 @@ func (a *App) Execute(command string) error {
 		fmt.Printf("Building %s... \n", command)
 		err = a.CreateStorageAdapter()
 	default:
-		return fmt.Errorf(constants.UndefinedCommandMsg, command)
+		err = fmt.Errorf(constants.UndefinedCommandMsg, command)
 	}
 
+	if err != nil {
+		return err
+	}
+
+	err = core.CreateErrors()
 	if err != nil {
 		return err
 	}

@@ -11,6 +11,7 @@ const ServiceFilePlaceholder = `service`
 const HandlerPlaceHolder = `handler`
 const TypesFile = "types"
 const TypesValidatorFile = "types_validation"
+const TypesImportFile = "types_import"
 
 // Messages
 const ProjectBuiltMsg = `Built %s, don't forget to commit`
@@ -36,3 +37,6 @@ const DefaultStorage = "mongo"
 const Service = "service"
 const Errors = "errors"
 const ErrCodes = "errCodes"
+
+// errors
+const ErrorEmptySpec = "empty spec"
