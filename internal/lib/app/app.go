@@ -51,7 +51,7 @@ func (a *App) Execute(command string) error {
 		err = core.CreateService()
 	case "http":
 		fmt.Printf("Building %s... \n", command)
-		err = a.CreateHttpAdapter()
+		err = core.CreateHttpAdapter()
 	case "storage":
 		fmt.Printf("Building %s... \n", command)
 		err = a.CreateStorageAdapter()
