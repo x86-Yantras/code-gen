@@ -3,28 +3,28 @@ const supertest = require("supertest");
 const routes = require("./routes");
 
 const server = require("../../../../../lib/test/server")(routes);
-const {{.ServiceName}}Svc = require("../../../service/{{.ServiceName}}");
-const { {{.ServiceName}}PayloadSchema } = require("../../../service/types");
+const {{.OperationID}}Svc = require("../../../service/{{.OperationID}}");
+const { {{.OperationID}}PayloadSchema } = require("../../../service/types");
 
 const fake = require("../../../../../lib/test/faker");
 
-jest.mock("../../../service/{{.ServiceName}}", () => jest.fn());
+jest.mock("../../../service/{{.OperationID}}", () => jest.fn());
 
 const request = supertest(server);
 
 describe("{{.HandlerName}} test", () => {
   it("should handle 500 error", async () => {
-    {{.ServiceName}}Svc.mockRejectedValue("internal server error");
+    {{.OperationID}}Svc.mockRejectedValue("internal server error");
 
-    const payload = fake({{.ServiceName}}PayloadSchema);
+    const payload = fake({{.OperationID}}PayloadSchema);
     const res = await request.{{.Method}}("{{.Path}}").send(payload);
 
     expect(res.statusCode).toEqual(500);
   });
 
   it("should return success with {{.HttpStatusCode}}", async () => {
-    {{.ServiceName}}Svc.mockResolvedValue({ test: true });
-    const payload = fake({{.ServiceName}}PayloadSchema);
+    {{.OperationID}}Svc.mockResolvedValue({ test: true });
+    const payload = fake({{.OperationID}}PayloadSchema);
     const res = await request.{{.Method}}("{{.Path}}").send(payload);
 
     expect(res.statusCode).toEqual({{.HttpStatusCode}});
@@ -34,12 +34,12 @@ describe("{{.HandlerName}} test", () => {
   });
 
    it("should handle service 400 error", async () => {
-    {{.ServiceName}}Svc.mockRejectedValue({
+    {{.OperationID}}Svc.mockRejectedValue({
       httpStatusCode: 400,
       name: "ValidationError",
     });
 
-    {{if (ne .Method "get" )}}const payload = fake({{.ServiceName}}PayloadSchema);{{end}}
+    {{if (ne .Method "get" )}}const payload = fake({{.OperationID}}PayloadSchema);{{end}}
     {{- if (eq .Method "get")}}
     const res = await request.{{.Method}}("{{.Path}}");
     {{- else}}

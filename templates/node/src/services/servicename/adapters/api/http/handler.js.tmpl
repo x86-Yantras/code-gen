@@ -1,7 +1,7 @@
 const createContext = require("../../../../../lib/context/context");
 const logger = require("../../../../../lib/logger/logger")();
-const {{.ServiceName}}Svc = require("../../../service/{{.ServiceName}}")
-const { {{.ServiceName}}Payload } = require("../../../service/types")
+const {{.OperationID}}Svc = require("../../../service/{{.OperationID}}")
+const { {{.OperationID}}Payload } = require("../../../service/types")
 
 // {{.HandlerName}}...
 const {{.HandlerName}} = async (req, res) => {
@@ -13,7 +13,7 @@ const {{.HandlerName}} = async (req, res) => {
         ...req.query 
       }
 
-      const resp = await {{.ServiceName}}Svc(context, {{.ServiceName}}Payload(payload))
+      const resp = await {{.OperationID}}Svc(context, {{.OperationID}}Payload(payload))
       return res.status({{.HttpStatusCode}}).json(svcToResponse(resp))
   } catch (error) {
       logger.error(error)
