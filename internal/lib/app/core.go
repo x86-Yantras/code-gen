@@ -23,16 +23,8 @@ type Core struct {
 type Service struct {
 	internals       []*ServiceInternal
 	types           []*ServiceType
-	apiAdapters     []*ApiHandler
+	apiAdapters     []*ServiceAdapter
 	storageAdapters []*Storage
-}
-
-// ApiHandler stores data required to build api handlers
-type ApiHandler struct {
-	Name       string
-	StatusCode string
-	Method     string
-	Path       string
 }
 
 // Storage stores data required to build storage adapter
@@ -67,7 +59,7 @@ func NewCore(deps *Dependencies) (*Core, error) {
 
 	servicesMap := map[string]*Service{}
 
-	for _, doc := range spec.Paths {
+	for path, doc := range spec.Paths {
 		specList := map[string]*openapi3.Operation{
 			http.MethodGet:    doc.Get,
 			http.MethodPost:   doc.Post,
@@ -107,10 +99,23 @@ func NewCore(deps *Dependencies) (*Core, error) {
 					return nil, err
 				}
 
+				serviceAdapter, err := NewServiceAdapter(&AdapterDependencies{
+					Config:      config,
+					Operation:   method,
+					Spec:        operation,
+					Templater:   templater,
+					Path:        path,
+					AdapterType: constants.APIHTTPAdapter,
+				})
+
+				if err != nil {
+					return nil, err
+				}
+
 				if servicesMap[serviceName] == nil {
 					servicesMap[serviceName] = &Service{
-						internals:       make([]*ServiceInternal, 0, 5),
-						apiAdapters:     make([]*ApiHandler, 0),
+						internals:       make([]*ServiceInternal, 0),
+						apiAdapters:     make([]*ServiceAdapter, 0),
 						types:           make([]*ServiceType, 0),
 						storageAdapters: make([]*Storage, 0),
 					}
@@ -118,6 +123,7 @@ func NewCore(deps *Dependencies) (*Core, error) {
 
 				servicesMap[serviceName].internals = append(servicesMap[serviceName].internals, serviceInternal)
 				servicesMap[serviceName].types = append(servicesMap[serviceName].types, serviceTypes)
+				servicesMap[serviceName].apiAdapters = append(servicesMap[serviceName].apiAdapters, serviceAdapter)
 			}
 		}
 
@@ -192,5 +198,33 @@ func (c *Core) CreateErrors() error {
 		return err
 	}
 
+	return nil
+}
+
+func (c *Core) CreateHttpAdapter() error {
+	if len(c.services) == 0 || c.services == nil {
+		return errors.New("no services to build")
+	}
+
+	for _, service := range c.services {
+		if len(service.apiAdapters) == 0 || service.apiAdapters == nil {
+			fmt.Println("no adapters")
+			break
+		}
+
+		var adapter *ServiceAdapter
+		for _, adapter = range service.apiAdapters {
+			err := adapter.Build()
+			if err != nil {
+				return err
+			}
+		}
+		err := adapter.BuildRoutes()
+
+		if err != nil {
+			return err
+		}
+
+	}
 	return nil
 }
