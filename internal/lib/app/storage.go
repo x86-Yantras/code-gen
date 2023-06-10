@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/x86-Yantras/code-gen/internal/adapters/templates"
@@ -208,6 +209,23 @@ func (app *App) BuildStorageIndex(storageImports map[string]map[string]bool) err
 			Overwrite: true,
 		})
 
+		return err
+	}
+
+	return nil
+}
+
+// Temporary for not breaking storage generation
+func (app *App) BuildAdapterDir(serviceName, adapterType string) error {
+	// create adapters dir
+	adapterDir := fmt.Sprintf(app.Config.AdapterDir, serviceName)
+
+	if err := app.Templater.CreateDir(adapterDir); err != nil {
+		return err
+	}
+
+	adapterPath := fmt.Sprintf("%s/%s", adapterDir, adapterType)
+	if err := app.Templater.CreateDir(strings.ToLower(adapterPath)); err != nil {
 		return err
 	}
 
