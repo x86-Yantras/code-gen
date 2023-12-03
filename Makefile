@@ -2,9 +2,10 @@
 build:
 	go build code-gen.go
 
-.PHONY: gen-node
+# usage cmd={http|services|storage} make gen-node-command
+.PHONY: gen-node-command
 gen-node:
-	rm -rf ./test && mkdir test && cd test && go run ../code-gen.go ../req.yaml node init && cd ..
+	mkdir -p test && cd test && go run ../code-gen.go ../req.yaml node $(cmd) && cd ..
 
 .PHONY: test
 test:
