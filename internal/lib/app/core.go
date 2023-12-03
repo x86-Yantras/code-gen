@@ -202,8 +202,36 @@ func (c *Core) CreateErrors() error {
 }
 
 func (c *Core) CreateHttpAdapter() error {
+	if len(c.services) == 0 {
+		return errors.New("no http to build")
+	}
+
+	for _, service := range c.services {
+		if len(service.apiAdapters) == 0 || service.apiAdapters == nil {
+			fmt.Println("no adapters")
+			break
+		}
+
+		var adapter *ServiceAdapter
+		for _, adapter = range service.apiAdapters {
+			err := adapter.Build()
+			if err != nil {
+				return err
+			}
+		}
+		err := adapter.BuildRoutes()
+
+		if err != nil {
+			return err
+		}
+
+	}
+	return nil
+}
+
+func (c *Core) CreateStorageAdapter() error {
 	if len(c.services) == 0 || c.services == nil {
-		return errors.New("no services to build")
+		return errors.New("no storage to build")
 	}
 
 	for _, service := range c.services {
